@@ -1,8 +1,10 @@
 apply plugin: 'com.android.application'
+apply plugin: 'realm-android'
 
 android {
     compileSdkVersion 30
     buildToolsVersion "30.0.3"
+
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -10,7 +12,7 @@ android {
     }
     defaultConfig {
         applicationId "com.example.diary"
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
@@ -33,5 +35,6 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
     implementation 'com.applandeo:material-calendar-view:1.7.0'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
 }

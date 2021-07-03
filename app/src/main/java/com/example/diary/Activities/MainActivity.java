@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import com.example.diary.Entitys.Event;
 import com.example.diary.R;
+import com.example.diary.RealmUtility;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -45,12 +46,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import io.realm.Realm;
+import io.realm.RealmResults;
+
 public class MainActivity extends AppCompatActivity {
     CalendarView calendarView;
     RecyclerView list;
-    EventAdapter adapter;
-    JSONArray jsonArray;
-    ArrayList<Event> arrayList;
 
     @Override
     protected void onCreate(Bundle savedInstanceEvent) {
@@ -66,85 +67,55 @@ public class MainActivity extends AppCompatActivity {
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         list.setLayoutManager(layoutManager);
 
+        initDay(System.currentTimeMillis());
+
         FloatingActionButton fab = findViewById(R.id.create);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Intent i = new Intent(MainActivity.this, CreationActivity.class);
+                startActivity(i);
             }
         });
 
-        try {
-            JSONObject obj = new JSONObject(loadJSONFromAsset());
-            jsonArray = obj.getJSONArray("events");
-            arrayList = new ArrayList<>();
-
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject jsonObject = jsonArray.getJSONObject(i);
-                Event e = new Event();
-
-                int id = jsonObject.getInt("id");
-                e.setId(id);
-                String date_start = jsonObject.getString("date_start");
-                e.setDate_start(Long.valueOf(date_start));
-                String date_finish = jsonObject.getString("date_finish");
-                e.setDate_finish(Long.valueOf(date_finish));
-                String name = jsonObject.getString("name");
-                e.setName(name);
-                String description = jsonObject.getString("description");
-                e.setDescription(description);
-
-                arrayList.add(e);
-            }
-
-            adapter = new EventAdapter(this, arrayList);
-            System.out.println(arrayList.get(0).toString());
-            list.setAdapter(adapter);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
 
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
 
-                ArrayList<Event> dayList = new ArrayList<>();
-                long selectedTime = view.getDate();
+                //ArrayList<Event> dayList = new ArrayList<>();
+                //long selectedTime = view.getDate();
+                //Calendar c2 = Calendar.getInstance();
+                ////c1.setTimeInMillis(selectedTime);
+                //for (Event e : arrayList) {
+                //    c2.setTimeInMillis(e.getDate_start() * 1000);
+                //    if (c1.get(Calendar.DATE) == c2.get(Calendar.DATE)) {
+                //        dayList.add(e);
+                //    }
+                //}
+                //list.setAdapter(new EventAdapter(getBaseContext(), dayList));
 
-                Calendar c1 = Calendar.getInstance();
-                c1 = new GregorianCalendar(year, month, dayOfMonth);
-                Calendar c2 = Calendar.getInstance();
-                //c1.setTimeInMillis(selectedTime);
-                for (Event e:arrayList) {
-                        c2.setTimeInMillis(e.getDate_start()*1000);
-                        if(c1.get(Calendar.DATE)==c2.get(Calendar.DATE)) {
-                            dayList.add(e);
-                        }
-                }
-                list.setAdapter(new EventAdapter(getBaseContext(), dayList));
+                Calendar c1 = new GregorianCalendar(year, month, dayOfMonth);
+                initDay(c1.getTimeInMillis());
+
             }
         });
 
     }
 
-    public String loadJSONFromAsset() {
-        String json = null;
-        try {
-            InputStream is = this.getAssets().open("events.json");
-            int size = is.available();
-            byte[] buffer = new byte[size];
-            is.read(buffer);
-            is.close();
-            json = new String(buffer, "UTF-8");
-            System.out.println(json);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            return null;
-        }
-        return json;
-    }
+    public void initDay(long dayBegin) {
+        ArrayList<Event> arrayList = new ArrayList<>();
 
+        Realm realm = Realm.getInstance(RealmUtility.getDefaultConfig());
+
+        RealmResults<Event> ar = realm.where(Event.class).beginGroup()
+                .greaterThan("date_start", dayBegin)
+                .and()
+                .lessThan("date_finish", dayBegin + 24 * 60 * 60 * 1000).endGroup().findAll();
+
+        arrayList.addAll(ar);
+        list.setAdapter(new EventAdapter(getBaseContext(), arrayList));
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -166,6 +137,7 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
 
 }
 

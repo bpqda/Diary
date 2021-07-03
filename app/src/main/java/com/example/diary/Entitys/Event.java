@@ -2,14 +2,26 @@ package com.example.diary.Entitys;
 
 import android.content.Context;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.Serializable;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 
-public class Event implements Serializable {
+import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
+
+public class Event extends RealmObject implements Serializable{
+
     int id;
+
+   long date_start;
+   long date_finish;
+    String name;
+    String description;
 
     public Event() {
     }
@@ -25,10 +37,7 @@ public class Event implements Serializable {
                 '}';
     }
 
-    long date_start;
-    long date_finish;
-    String name;
-    String description;
+
 
     public Event(int id, long date_start, long date_finish, String name, String description) {
         this.id = id;
@@ -87,5 +96,20 @@ public class Event implements Serializable {
         String formattedTimeStart = sdf.format(timestart);
         String formattedTimeEnd = sdf.format(timeend);
         return formattedTimeStart + " - " + formattedTimeEnd;
+    }
+    public JSONObject convertToJSON() {
+        JSONObject JSONobj = new JSONObject() ;
+
+        try {
+            JSONobj.put("id", id);
+            JSONobj.put("date_start", date_start);
+            JSONobj.put("date_finish", date_finish);
+            JSONobj.put("name", name);
+            JSONobj.put("description", description);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return JSONobj;
     }
 }
