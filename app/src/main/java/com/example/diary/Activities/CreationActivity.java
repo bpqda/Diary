@@ -44,13 +44,17 @@ public class CreationActivity extends AppCompatActivity {
         EditText name = findViewById(R.id.name);
         EditText description = findViewById(R.id.description);
 
+        //Выбор даты события
         Button dateBtn = findViewById(R.id.date);
         dateBtn.setOnClickListener(v -> {
+
+            //Получение сегодняшней даты
             final Calendar c = Calendar.getInstance();
             int mYear = c.get(Calendar.YEAR);
             int mMonth = c.get(Calendar.MONTH);
             int mDay = c.get(Calendar.DAY_OF_MONTH);
 
+            //Календарь в диалоговом окне
             DatePickerDialog datePickerDialog = new DatePickerDialog(v.getContext(), (view, year, monthOfYear, dayOfMonth) -> {
                 Calendar c1 = new GregorianCalendar(year, monthOfYear, dayOfMonth);
                 date = c1.getTimeInMillis();
@@ -59,28 +63,33 @@ public class CreationActivity extends AppCompatActivity {
             datePickerDialog.show();
         });
 
+        //Выбор времени начала события
         Button since = findViewById(R.id.since);
         since.setOnClickListener(v -> {
             date_start = date + time.getCurrentHour() * 60 * 60 * 1000 + time.getCurrentMinute() * 60 * 1000;
-
             since.setText(time.getCurrentHour() + ":" + time.getCurrentMinute());
         });
 
+        //Выбор времени окончания события
         Button to = findViewById(R.id.to);
         to.setOnClickListener(v -> {
             date_finish = date + time.getCurrentHour() * 60 * 60 * 1000 + time.getCurrentMinute() * 60 * 1000;
             to.setText(time.getCurrentHour() + ":" + time.getCurrentMinute());
         });
 
+        //Создание события
         Button create = findViewById(R.id.create);
         create.setOnClickListener(v -> {
 
             Realm realm = Realm.getInstance(RealmUtility.getDefaultConfig());
+
+            //Увеличение id
             Number newId = realm.where(Event.class).max("id");
-            if(newId==null) {
-                newId =0;
+            if (newId == null) {
+                newId = 0;
             }
 
+            //Создание события
             realm.beginTransaction();
 
             Event e = realm.createObject(Event.class);
@@ -92,6 +101,7 @@ public class CreationActivity extends AppCompatActivity {
 
             realm.commitTransaction();
 
+            //Переход кв MainActivity
             onBackPressed();
         });
 

@@ -28,10 +28,12 @@ public class EventInfoActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        //Получение события из базы данных
         Realm realm = Realm.getInstance(RealmUtility.getDefaultConfig());
-        int eventID = getIntent().getIntExtra("eventID", -1);
+        int eventID = getIntent().getIntExtra("eventID", 0);
         Event e = realm.where(Event.class).equalTo("id", eventID).findFirst();
 
+        //Заполнение информации о событии
         TextView name = findViewById(R.id.name);
         name.setText(e.getName());
 
@@ -41,6 +43,7 @@ public class EventInfoActivity extends AppCompatActivity {
         TextView description = findViewById(R.id.description);
         description.setText(e.getDescription());
 
+        //Удаление события из базы данных
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(view -> {
             realm.executeTransaction(realm1 -> {

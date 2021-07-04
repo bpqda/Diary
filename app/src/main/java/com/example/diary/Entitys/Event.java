@@ -17,8 +17,7 @@ public class Event extends RealmObject {
     private String name;
     private String description;
 
-    public Event() {
-    }
+    public Event() {}
 
     public int getId() {
         return id;

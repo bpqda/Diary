@@ -44,20 +44,24 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        //Инициализация списка событий
         list = findViewById(R.id.recyclerView);
         list.setHasFixedSize(true);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         list.setLayoutManager(layoutManager);
 
+        //Заполнение списка сегодняшними событиями
         initDay(System.currentTimeMillis());
 
+        //Создание нового события
         FloatingActionButton fab = findViewById(R.id.create);
         fab.setOnClickListener(view -> {
             Intent i = new Intent(MainActivity.this, CreationActivity.class);
             startActivity(i);
         });
 
+        //Выбор даты
         CalendarView calendarView = findViewById(R.id.calendar);
         calendarView.setOnDateChangeListener((view, year, month, dayOfMonth) -> {
             Calendar c = new GregorianCalendar(year, month, dayOfMonth);
@@ -67,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    //Заполнение recyclerView событиями в выбранный день
     public void initDay(long dayBegin) {
 
         Realm realm = Realm.getInstance(RealmUtility.getDefaultConfig());
@@ -78,28 +83,6 @@ public class MainActivity extends AppCompatActivity {
 
         ArrayList<Event> arrayList = new ArrayList<>(ar);
         list.setAdapter(new EventAdapter(getBaseContext(), arrayList));
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfEventment
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -123,7 +106,6 @@ class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> {
 
     @Override
     public EventAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-
         View view = inflater.inflate(R.layout.event_list_item, parent, false);
         return new ViewHolder(view);
     }
@@ -137,6 +119,7 @@ class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> {
         holder.time.setText(event.getTime(context));
         holder.name.setText(event.getName());
 
+        //Переход к активности с информацией о событии при нажатии на событие из списка
         holder.itemView.setOnClickListener(v -> {
             Intent i = new Intent(context, EventInfoActivity.class);
             i.putExtra("eventID", event.getId());
