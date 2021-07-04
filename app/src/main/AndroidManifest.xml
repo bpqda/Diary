@@ -14,7 +14,7 @@
 
         <activity android:name=".Activities.CreationActivity"></activity>
         <activity
-            android:name=".Activities.DayActivity"
+            android:name=".Activities.EventInfoActivity"
             android:label="@string/title_activity_day"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
